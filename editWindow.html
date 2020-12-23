@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit Wine</title>
+    <link rel="stylesheet" href="./content/bootstrap/css/bootstrap.min.css">
+    <script src="content/bootstrap/js/bootstrap.min.js"></script>
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <h3 class="alert alert-success">Modify <span id="head"></span></h3>    
+    <div class="input-group mb-3">
+      <input type="text" id="student_id" class="form-control" placeholder="Enter Student ID" aria-label="Recipient's username" aria-describedby="basic-addon2" autofocus>
+    </div>
+    
+    
+    <form name="wineEditForm" onsubmit="return validateForm()">
+      <div id="ErrorMessage">
+      
+      </div>
+      <div>
+        <table class="table table-dark">
+          <tr>
+           
+            <td><input type="hidden" id="studentId" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Name:</label></td>
+            <td><input class="form-control" type="text" id="name" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Email:</label></td>
+            <td><input class="form-control" type="text" id="email" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Phone:</label></td>
+            <td><input class="form-control" type="text" id="phone" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Address:</label></td>
+            <td><input class="form-control" type="text" id="address" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Tuition:</label></td>
+            <td><input class="form-control" type="text" id="tuition" autofocus></td>
+          </tr>
+          <tr>
+            <td><label>Year:</label></td>
+            <td><input class="form-control" type="text" id="year" autofocus></td>
+          </tr>
+        </table>
+  
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+    </form>
+
+  <script>
+    const electron = require('electron')
+    const {ipcRenderer} = electron;
+    const form = document.querySelector('form');
+
+    function validateForm(){
+      const regex = /^\d{4}$/;
+      const year = document.querySelector('#year').value
+      const isYear= regex.test(year)
+      
+      const regexEmail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      const email = document.querySelector('#email').value
+      const isEmail= regexEmail.test(year)
+      if(!isYear){
+        document.getElementById("ErrorMessage").innerHTML = "Enter a valid year"
+        //alert("Please input a correct year format ")
+        return false;
+      }
+      // else if(!isEmail){
+      //   document.getElementById("ErrorMessage").innerHTML = "Enter a valid Email"
+      //   return false;
+      // }
+      return true;      
+    }
+
+    form.addEventListener('submit', submitForm);
+
+
+    const editButton = document.getElementById("student_id");
+    editButton.addEventListener('keyup', editStudent);
+    function editStudent(){
+      var pID = parseInt(document.getElementById("student_id").value);
+      ipcRenderer.send('item:edit', pID) 
+    }
+
+    ipcRenderer.on('item:editItem', function(e,item)
+      {   
+        console.log(item)  
+        var secondTable= document.querySelectorAll('table')[0];
+        var inputField= secondTable.querySelectorAll('input');  
+        var head= document.getElementById('head');
+        if(item.length> 0)
+        {
+          head.innerText=item[0].name;
+          inputField.forEach(input=>{
+            input.style.backgroundColor="grey";
+          })
+          document.querySelector('#studentId').value=item[0].studentId;
+          document.querySelector('#name').value=item[0].name;
+          document.querySelector('#email').value=item[0].email;
+          
+          document.querySelector('#phone').value=item[0].phone;
+          document.querySelector('#address').value=item[0].address;
+          document.querySelector('#tuition').value=item[0].tuition;
+          document.querySelector('#year').value=item[0].year;
+        }else{
+          inputField.forEach(input=>{
+            input.style.backgroundColor="white";
+            input.value=null;
+            head.innerText=null;
+          })
+        } 
+       
+      }
+    )
+
+    
+    function submitForm(e) {
+      e.preventDefault();
+
+    
+      if(validateForm()== false){ return false}; 
+        const id= document.querySelector('#studentId').value;
+        const name= document.querySelector('#name').value;
+        const email= document.querySelector('#email').value;
+        const phone= document.querySelector('#phone').value;
+        const address= document.querySelector('#address').value;
+        const tuition= document.querySelector('#tuition').value;
+        const year= document.querySelector('#year').value;                  
+      
+       
+      ipcRenderer.send('item:editDone',id,name,email,phone,address,tuition,year);//send to main.js
+    }
+  </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "nostate",
+  "version": "1.0.0",
+  "description": "No state pasta app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "author": "D Russell",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^9.2.0",
+    "electron-builder": "^22.9.1",
+    "jquery": "^3.5.1",
+    "knex": "^0.21.6",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^2.2.0"
+  }
+}

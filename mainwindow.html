@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Wine Collection app</title>
+    <link rel="stylesheet" href="./content/bootstrap/css/bootstrap.min.css">
+    <script src="content/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/yourcode.js"></script>
+    <style>
+
+      body{
+        background-color: grey;
+        background-size: cover;
+        color: white;
+      }
+    
+  
+   
+    </style>
+  </head>
+  <body>
+    <h1 class="text-light bg-dark text-center">Student Records:</h1>
+    <input type="text" id="myInput" class="form-control" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+    <div id="studentCollection">
+      <table class="table" id="myTable">
+        <tr class="thead-dark">
+          <th>Student ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Tuition</th>
+          <th>Year</th>
+        </tr>
+        <tbody id="studentTable">
+
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      const electron = require('electron');
+      const {ipcRenderer} = electron;
+
+      function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }       
+        }
+      }
+      const studentDiv = document.getElementById('studentTable');
+      
+      //item,category,type,year,winery,yearPurchased,rating
+      //catch add item
+      ipcRenderer.on('item:add', function(e,items)
+      {
+        console.log(items)
+        items.forEach(function(item){
+          var allInput=[item.studentId,item.name, item.email,item.phone,item.address,item.tuition,item.year];
+
+                      var tr,td,itemText;
+          tr = document.createElement('tr');
+          tr.setAttribute("class","eachStudent");
+          
+          for (var i=0; i<allInput.length;i++)
+          {          
+            td = document.createElement('td');
+            itemText = document.createTextNode(allInput[i]);
+            td.appendChild(itemText);
+            tr.appendChild(td);          
+          }
+          studentDiv.append(tr);
+        })
+      
+      });
+
+      //item clear
+      ipcRenderer.on('item:clear', function(){
+        studentDiv.innerHTML = '';
+      });
+
+      
+      
+      
+      
+
+
+      
+
+    </script>
+
+  </body>
+</html>

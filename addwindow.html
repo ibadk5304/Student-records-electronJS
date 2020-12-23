@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>add Wine</title>
+    <link rel="stylesheet" href="http:bootswatch.com/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="./content/bootstrap/css/bootstrap.min.css">
+    <script src="content/bootstrap/js/bootstrap.min.js"></script>
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div id="ErrorMessage">
+      
+    </div>
+    <form name="wineAddForm" onsubmit="return validateForm()">
+      <div>
+        <h3 class="alert alert-success">Add new student</h3>  
+        <table class="table table table-dark">
+          <tr>
+            <td><label>Name:</label></td>
+            <td><input class="form-control" type="text" id="name" autofocus required></td>
+          </tr>
+          <tr>
+            <td><label>Email:</label></td>
+            <td><input class="form-control" type="email" id="email" required></td>
+          </tr>
+
+          <tr>
+            <td><label>Phone:</label></td>
+            <td><input class="form-control" type="text" id="phone" required></td>
+          </tr>
+
+          <tr>
+            <td><label>Address:</label></td>
+            <td><input class="form-control" type="text" id="address" required></td>
+          </tr>
+          <tr>
+            <td><label>Tuition:</label></td>
+            <td><input class="form-control" type="text" id="tuition" required></td>
+          </tr>
+          <tr>
+            <td><label>Year:</label></td>
+            <td> <input class="form-control" type="text" id="year" required></td>
+          </tr>
+        </table>
+  
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">add item</button>
+    </form>
+
+  <script>
+    const electron = require('electron')
+    const {ipcRenderer} = electron
+    const form = document.querySelector('form');
+    
+    function validateForm(){
+      const regex = /^\d{4}$/;
+      const year = document.querySelector('#year').value
+      const isYear= regex.test(year);
+
+      if(!isYear){
+        document.getElementById("ErrorMessage").innerHTML = "Enter a valid year"
+        return false;
+      }
+
+      return true;      
+    }
+  
+    form.addEventListener('submit', submitForm);
+
+    function submitForm(e) {
+      e.preventDefault();
+
+      if(validateForm()== false){ return false};      
+      let name = document.querySelector('#name').value;
+      let email = document.querySelector('#email').value;
+      let phone = document.querySelector('#phone').value;
+      let address = document.querySelector('#address').value;
+      let tuition = document.querySelector('#tuition').value;
+      let year = document.querySelector('#year').value;
+             
+      ipcRenderer.send('item:add',name,email,phone,address,tuition,year);//send to main.js
+    }
+  </script>
+  </body>
+</html>
